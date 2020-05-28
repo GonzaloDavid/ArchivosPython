@@ -29,6 +29,7 @@ def metodo():
 	orderandValueList = []
 	subfields = []
 	fieldSizeList=[]
+	
 
 	for line in f:
 		if line!=None:
@@ -47,12 +48,12 @@ def metodo():
 					if(existeSubcampos != -1) :
 						stringTokenizadosubcampos=campos.strip().split(']')
 						sizeSubfields=len(stringTokenizadosubcampos)
-						for subcampos in stringTokenizadosubcampos : 
-							subfields.append(File(index, subcampos,sizeSubfields))
-							print "Subcampos %s" %subcampos
+						for subcampos in stringTokenizadosubcampos :
+							subfields.append(File(index, subcampos,sizeSubfields)) 
+							#print "Subcampos %s" %subcampos
 					else :
 						orderandValueList.append(File(index, campos,0))
-						print "stringTokenizadoCampos %s" %campos
+						#print "stringTokenizadoCampos %s" %campos
 					index= index+1
 	
 	#Escribir en el archivo
@@ -64,31 +65,53 @@ def metodo():
 	#Obtenemos el numero de campos o columnas en archivo
 	numFields=np.amax(fieldSizeList)
 	print "tamanio %s" %numFields
+
 	col = 1
 	row = 0
 	for x in range(numFields) :
-		
+		#Filtramos los campos
 		fieldsFiltered = filter(lambda field: field.order==x , orderandValueList)
 		nameHeader= 'campo'+str(x)
-   		fieldsFiltered = [File(x, nameHeader)] + fieldsFiltered
+   		fieldsFiltered = [File(x, nameHeader,0)] + fieldsFiltered
+
+   		#Obtenemos el numero maximo de subcampos
+		
+		subfieldsFiltered=filter(lambda field: field.order==x , subfields)
+		subfieldSizeList=[]
+		for sizeSubfields in subfieldsFiltered :
+			subfieldSizeList.append(sizeSubfields.sizeList)
+		
+		numSubfields= 0
+		if(len(subfieldSizeList)>0):
+				numSubfields=np.amax(subfieldSizeList)
+		
+		print "sizeSubfields %s" %numSubfields
 		#Recorremos los campos por posicion
 		row = 0
 		for orderandValue1 in fieldsFiltered:
 			#Poner cabeceras
    			if (x==16) :
 				codeCategoryTokenizado= orderandValue1.value.strip().split('.')
-				print "-------------------------------------> %s" 
+				
 				for code in codeCategoryTokenizado :
 					
 					if(len(codeCategoryTokenizado)>4):
 						
 						codeCategory=codeCategoryTokenizado[4]
-						print "codeCategory %s" %codeCategory
+						#print "codeCategory %s" %codeCategory
 					else :
 					#Alerta no tiene categoria
 						print("NO TIENE CATEGORIA %s" %code)
 
 			hoja.write(row, col, orderandValue1.value)
+   			row += 1
+   		row = 0
+   		print "-------------------------------------> %s" 
+   		for subfield in subfieldsFiltered : 
+   			print "subfield CAMPOS %s" %subfield.value
+   			print "col %s" %col
+   			print "row %s" %row
+   			hoja.write(row, col, subfield.value)
    			row += 1
    		col += 1
    	#Cerramos el libro

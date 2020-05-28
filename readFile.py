@@ -107,13 +107,25 @@ def metodo():
    			row += 1
    		row = 0
    		print "-------------------------------------> %s" 
+   		
+   		
    		for subfield in subfieldsFiltered : 
+   			subfieldCount=0
    			print "subfield CAMPOS %s" %subfield.value
    			print "col %s" %col
    			print "row %s" %row
-   			hoja.write(row, col, subfield.value)
-   			row += 1
+   			if (subfieldCount==0) :
+   				row = 0
+   				nameSubHeader= 'campo'+str(x)+'.'+str(col)
+   				#hoja.write(row, col, nameSubHeader)	
+   				#row += 1
+   			#hoja.write(row, col, subfield.value)
+   			#col += 1
+   			
+   			subfieldCount +=1
+
    		col += 1
+   		
    	#Cerramos el libro
    	libro.close()
    	

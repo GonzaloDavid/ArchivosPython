@@ -3,15 +3,14 @@ import xlrd
 
 class Parametrizacion:
 
-	def __init__(self):
-
-		arrayListCategorias=['1001','6001']
-		self.cargarParametrizacion(arrayListCategorias)
+	def __init__(self,arrayListCategories):
+		self.param=self.cargarParametrizacion(arrayListCategories)
 
 	def cargarParametrizacion(self, arrayListCategorias):
-		global arrayCategorias
-		global arrayCampos
-		global arraySubCampos
+	#	arrayListCategorias=['1001','6001']
+		arrayCategorias=[]
+		arrayCampos=[]
+		arraySubCampos=[]
 		#Abrimos el fichero excel
 		documento = xlrd.open_workbook("parametrizaion.xlsx")
 			#Podemos guardar cada una de las hojas por separado
@@ -59,7 +58,7 @@ class Parametrizacion:
 					
 		#print (arrayCategorias[0][2])
 		
-		print("*******************************************")
+		
 
 		##### Matriz de SubCampos
 		i=-1
@@ -73,15 +72,7 @@ class Parametrizacion:
 					for j in xrange(col_subCampos):
 						arraySubCampos[i].append(subcampos.cell_value(y,j))
 
+		print("*******************************************Categorias")
+		print (arrayCategorias)
+		return (arrayCategorias,arrayCampos,arraySubCampos)
 		
-
-arrayCategorias=[]
-arrayCampos=[]
-arraySubCampos=[]
-parametrizacion = Parametrizacion()
-print("*******************************************Categorias")
-print (arrayCategorias)
-print("*******************************************Campos")
-print (arrayCampos)
-print("*******************************************Subcampos")
-print (arraySubCampos)

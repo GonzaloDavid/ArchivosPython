@@ -45,8 +45,6 @@ def metodo():
 	#for orderandValue in orderandValueList :
 		#print "order %s" %orderandValue.order
 		#print "orderandValue %s" %orderandValue.value
-	
-
 	row = 0
 	col = 0
 	#Escribir en el archivo
@@ -55,17 +53,17 @@ def metodo():
 	hoja = libro.add_worksheet('Categoria1')
 
 	for orderandValue1 in (orderandValueList):
-		hoja.write(row, col,     orderandValue1.value)
-
-   		print "value %s" %orderandValue1.value
+		hoja.write(row, col,     orderandValue1.order)
    		hoja.write(row, col + 1, orderandValue1.value)
-   		hoja.write(row, 0, 'Total:')
-		#print "row %s" %row
-   		#Pintamos la fila de totales
-	   	row += 1
+   		row += 1
+   		print "value %s" %orderandValue1.value
+   	
+   	#Pintamos la fila de totales
+   	hoja.write(row, 0, 'Total:')
+   	hoja.write(row, 1, '=SUM(B1:B7)')
 
-		#Cerramos el libro
-		libro.close() 
+	#Cerramos el libro
+	libro.close() 
 		
 
 metodo()

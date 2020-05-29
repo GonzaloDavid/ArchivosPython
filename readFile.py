@@ -60,20 +60,21 @@ def Readprocess():
 	
 	countCategory=0
 	for category in categoryListParam :
-		
+		# --------------------------------------------------------------------------------
 		nameFile= 'LecturaArchivos'+category[3]+'.xlsx'
 		libro = xlsxwriter.Workbook(nameFile)
 		codecategoryCurrency=category[0]
 		hoja = libro.add_worksheet(category[3])
 		tamanio = len(orderandValueList);
 
+		# --------------------------------------------------------------------------------
 		#Obtenemos el numero de campos o columnas en archivo
 		numFields=np.amax(fieldSizeList)
 		print "tamanio %s" %numFields
 
 		col = 0
 		row = 0
-
+		# --------------------------------------------------------------------------------
 		for columnNumber in range(numFields) :
 			
 			keyandValueList=[]
@@ -81,8 +82,6 @@ def Readprocess():
 			headerNameFilter=filterFieldParambyCategory(fieldsListParam,category,columnNumber)
 			#Obtenemos el numero maximo de subcampos
 			subfieldsFiltered=filter(lambda field: field.order==columnNumber, subfields)
-
-			#subcamposLabel=set()
 			
 			if(len(headerNameFilter)>0):
 				#print "headerNameFilter %s" %headerNameFilter				
@@ -90,98 +89,30 @@ def Readprocess():
 				if(isMultiValue=='N') :
 					nameColumn=headerNameFilter[0][2]
 				else : 
-					#ES UN MULTI VALOR
+					#Es una variable multivalor
 					isLabel=headerNameFilter[0][4]
 					#ES un valor
 					if(isLabel=='N') :
-						
-						#Referencia a la etiqueta
-						print "COLUMNA--++++++++++++++++-----------------------------------------------> %s" %columnNumber
-						referenceValues=headerNameFilter[0][5]
-						print "references--++++++++++++++++-----------------------------------------------> %s" %referenceValues
-						if(referenceValues!=None and referenceValues!=''):
+						keyandValueList= buildKeyAndValue(columnNumber,headerNameFilter,subfields,subfieldsFiltered)
 
-							print "referenceValues %s" %referenceValues
-							referenceAux=int(referenceValues)-1
-							columnLabel= filter(lambda field: str(field.order)==str(referenceAux) , subfields)
-							#print "len columnLabel------> %s" %len(subfieldsFiltered)
-							
-							
-							if(len(columnLabel)>0):
-
-								for index,value in enumerate(subfieldsFiltered) :
-									#print "Rownumber %s" %str(value.rowNumber)
-									#print "numberrrrrrrr %s" %str(index)
-									test=columnLabel[index]
-									#print "test %s" %str(test.value)
-									keyandValueList.append(File(columnNumber, value.value,0,0,test.value)) 
-
-
-						else : 
-							print "Es un valor sin referencia a label %s"
-
-
-
-					
-
-			#print "keyandValueList %s" %str(keyandValueList)
-			#print "fieldsListParam %s" %str(headerNameFilter)
-			#Filtramos los campos
+			# --------------------------------------------------------------------------------
 
 			fieldsFiltered = filter(lambda field: field.order==columnNumber , orderandValueList)
 			nameHeader= nameColumn
    			fieldsFiltered = [File(columnNumber, nameHeader,0,0,'')] + fieldsFiltered
 
-   			
 			subfieldSizeList=[]
-			#for sizeSubfields in subfieldsFiltered :
-			
-			#	subfieldSizeList.append(sizeSubfields.sizeList)
-		
-			#	numSubfields= 0
-			#if(len(subfieldSizeList)>0):
-			#	numSubfields=np.amax(subfieldSizeList)
-			#-------------------------------LLENA CAMPOS---------------------
-			#Recorremos los campos por posicion
+			# --------------------------------------------------------------------------------
+			#Guardar en archivo los campos 
 			row = 0
 			for orderandValue1 in fieldsFiltered:
-				#Poner cabeceras
-	   			if (columnNumber==positionCategoryFields) :
-					codeCategoryTokenizado = orderandValue1.value.strip().split('.')
-					
-					for code in codeCategoryTokenizado :
-					
-						if(len(codeCategoryTokenizado)>positionCategorySubFields):
-						
-							codeCategory=codeCategoryTokenizado[positionCategorySubFields]
-							#print "codeCategory %s" %codeCategory
-						else :
-						#Alerta no tiene categoria
-							print("NO TIENE CATEGORIA %s" %code)
-
+				codeCategory=getCategorybyLine(columnNumber,positionCategoryFields,orderandValue1,positionCategorySubFields)
 				hoja.write(row, col, orderandValue1.value)
    				row += 1
-   			
-   			#--------------------------------------------------------------------
    			col += 1
-   			
-   			
+   			#--------------------------------------------------------------------
+   			#Guaradar los Subcampos o compos Multivalor
    			keyandValueListAux=keyandValueList
-   			keyandValueListAux.append(File(4, 1222,0,0,'label de prueba')) 
-   			keyandValueListAux.append(File(4, 1222,0,0,'label de prueba')) 
-   			keyandValueListAux.append(File(4, 1222,0,0,'label de prueba')) 
-   			keyandValueListAux.append(File(4, 1222,0,0,'label de prueba')) 
-   			keyandValueListAux.append(File(4, 1222,0,0,'label de prueba')) 
-   			keyandValueListAux.append(File(4, 1222,0,0,'label de prueba')) 
-   			keyandValueListAux.append(File(4, 1222,0,0,'label de prueba')) 
-   			keyandValueListAux.append(File(4, 1222,0,0,'label de prueba')) 
-   			keyandValueListAux.append(File(4, 1222,0,0,'label de prueba')) 
-   			keyandValueListAux.append(File(4, 1222,0,0,'label de prueba')) 
-   			keyandValueListAux.append(File(4, 1222,0,0,'label de prueba')) 
-   			keyandValueListAux.append(File(4, 1222,0,0,'label de prueba')) 
-
-   			keyandValueListAux = [File(4, 'hola',0,0,'label')] + keyandValueListAux
-   			
 			#for i in keyandValueList :
    				#print "key %s" %i.key
    				#print "value %s" %i.value
@@ -190,66 +121,18 @@ def Readprocess():
    			for listasubcamposFiltrada in listadeparametrosSubcampos : 
    				print "i???????????????????????????????????????????????????????????? %s" %len(keyandValueListAux)
    				print "tamaño de lista a imprimir %s" %len(listadeparametrosSubcampos)
-   				subcamposKeyValueFinal = []
-   				#filter(lambda field: str(field.key)==str(listasubcamposFiltrada[2]), keyandValueList)
-   				
-   				#subcamposKeyValueFinal
+   				subcamposKeyValueFinal = filter(lambda field: str(field.key)==str(listasubcamposFiltrada[2]), keyandValueList)
    				row=0
-   				for orderandValueSub in keyandValueListAux:
+   				for orderandValueSub in subcamposKeyValueFinal:
    					print "GRAVO %s" %listadeparametrosSubcampos[0]
    					hoja.write(row, col-1, orderandValueSub.value)
    					row += 1
-
-
-   			#print "listadeparametrosSubcampos %s" %listadeparametrosSubcampos
-   			#listadeparametrosSubcampos=[]
-   			#for t in subfieldListParam :
-   				#print "-----------------------------------> %s" %str(t)
-   			#	if(t[0]==category[0] and t[1]==str(col)) :
-   			#		listadeparametrosSubcampos= t
-   			#		print "testing %s" %str(listadeparametrosSubcampos)
-   				
-   			
-   			
-
-   			
-   			row = 0
-
-   			for idx,subfield in enumerate(subfieldsFiltered) : 
-   				subfieldCount=0
-   			
-   				#print "rows ss %s" %idx
-				#print "rows de filter %s" %subfield.value
-   				if (subfieldCount==0) :
-   					#row = 0
-   					nameSubHeader= 'campo'+str(columnNumber)+'.'+str(col)
-   					#hoja.write(row, col, nameSubHeader)	
-   					#row += 1
-   				#if(subfield.rowNumber != subfieldsFiltered[idx-1].rowNumber) :
-	   				#print "rows ss %s" %idx
-   					#row += 1
-
-	   			#hoja.write(row, col, subfield.value)
-   				#col += 1
-   			
-   				subfieldCount +=1
+   			#--------------------------------------------------------------------
 
    		row += 1
-   			
    		countCategory +=1;
-   		#Cerramos el libro
    		libro.close()
-   	
-   	#print "resultado de la suma %s" %dd
-   		#Pintamos la fila de totales
-   		#hoja.write(row, 0, 'Total:')
-	 	#hoja.write(row, 1, '=SUM(B1:B7)')
-#NUM_HILOS = 3
-#for num_hilo in range(NUM_HILOS):
-#   hilo = threading.Thread(name='hilo%s' %num_hilo, 
-#                          target=metodo)    
-# hilo.start()
-
+   
 
 def getFieldsParam(ruta) :
 	#Variables
@@ -292,6 +175,37 @@ def filterFieldParambyCategory(fieldsListParam,category ,columnNumber):
 	headerNameFilterbyCategory= filter(lambda field:  field[0]==category[0]  , fieldsListParam)
 	headerNameFilter= filter(lambda field:  int(field[1])==columnNumber+1  , headerNameFilterbyCategory)
 	return  headerNameFilter
+
+def buildKeyAndValue(columnNumber,headerNameFilter,subfields,subfieldsFiltered):
+	#Construir clave y valor
+	keyandValueList=[]
+	print "COLUMNA--++++++++++++++++-----------------------------------------------> %s" %columnNumber
+	referenceValues=headerNameFilter[0][5]
+	print "references--++++++++++++++++-----------------------------------------------> %s" %referenceValues
+	if(referenceValues!=None and referenceValues!=''):
+		print "referenceValues %s" %referenceValues
+		referenceAux=int(referenceValues)-1
+		columnLabel= filter(lambda field: str(field.order)==str(referenceAux) , subfields)							
+		if(len(columnLabel)>0):
+			for index,value in enumerate(subfieldsFiltered) :
+				label=columnLabel[index]
+				keyandValueList.append(File(columnNumber, value.value,0,0,label.value)) 
+
+	else : 
+		print "Es un valor sin referencia a label %s"
+	return  headerNameFilter
+
+def getCategorybyLine(columnNumber,positionCategoryFields,orderandValue1,positionCategorySubFields):
+	#Poner cabeceras
+	codeCategory=''
+	if (columnNumber==positionCategoryFields) :
+		codeCategoryTokenizado = orderandValue1.value.strip().split('.')
+		for code in codeCategoryTokenizado :
+			if(len(codeCategoryTokenizado)>positionCategorySubFields):
+				codeCategory=codeCategoryTokenizado[positionCategorySubFields]
+			else :
+				print("NO TIENE CATEGORIA %s" %code)
+	return  codeCategory
 
 
 

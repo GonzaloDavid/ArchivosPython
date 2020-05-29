@@ -210,7 +210,7 @@ def metodo():
 				#print "rows de filter %s" %subfield.value
    				if (subfieldCount==0) :
    					#row = 0
-   					#nameSubHeader= 'campo'+str(columnNumber)+'.'+str(col)
+   					nameSubHeader= 'campo'+str(columnNumber)+'.'+str(col)
    					#hoja.write(row, col, nameSubHeader)	
    					#row += 1
    				if(subfield.rowNumber != subfieldsFiltered[idx-1].rowNumber) :

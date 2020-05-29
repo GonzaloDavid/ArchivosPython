@@ -43,6 +43,8 @@ def metodo():
 	categoryListParam=resultParam[0]
 	fieldsListParam=resultParam[1]
 	subfieldListParam=resultParam[2]
+	print "SUBCAMOPOS 0%s" % subfieldListParam
+	print "fieldsListParam 0%s" % fieldsListParam
 	
 	orderandValueList = []
 	subfields = []
@@ -125,43 +127,64 @@ def metodo():
 		row = 0
 
 		#for fieldParam in fieldsListParam : 
+		#Solo para los subItems
+
+
 	
 		for columnNumber in range(numFields) :
 			#Buscar nombre de cabecera
 			#print "columnNumber %s" %columnNumber
+			
 			headerNameFilterbyCategory= filter(lambda field:  field[0]==category[0]  , fieldsListParam)
+			
 			headerNameFilter= filter(lambda field:  int(field[1])==columnNumber+1  , headerNameFilterbyCategory)
 			nameColumn=''
 			
 			#Obtenemos el numero maximo de subcampos
 			subfieldsFiltered=filter(lambda field: field.order==columnNumber, subfields)
 
-			subcamposLabel=set()
+			#subcamposLabel=set()
 			keyandValueList=[]
 			if(len(headerNameFilter)>0):
-				print "headerNameFilter %s" %headerNameFilter
+				#print "headerNameFilter %s" %headerNameFilter				
 				isMultiValue=headerNameFilter[0][3]
 				if(isMultiValue=='N') :
 					nameColumn=headerNameFilter[0][2]
 				else : 
 					#ES UN MULTI VALOR
 					isLabel=headerNameFilter[0][4]
-					if(isLabel=='S') :
-						#Es un etiqueta
-						#print "es etiqueta"
+					#ES un valor
+					if(isLabel=='N') :
 						
-						for label in subfieldsFiltered :
-							print "label %s" %str(label.value)
-							subcamposLabel.add(label)
-					else :
-						print "es valor"
-						#Es un valor
+						#Referencia a la etiqueta
+						referenceValues=headerNameFilter[0][5]
+						if(referenceValues!=None and referenceValues!=''):
 
-					
+							for test in subfields :
+								s=0
+								#print "referenceValues %s"%str(test)
+							print "referenceValues %s" %referenceValues
+							columnLabel= filter(lambda field: field.order==referenceValues , subfields)
+							print "columnLabel %s" %str(columnLabel)
+							if(len(columnLabel)>0):
+
+								for value in subfieldsFiltered :
+									#print "Rownumber %s" %str(value.rowNumber)
+									#print "value %s" %str(value.rowNumber)
+									test=columnLabel[value.rowNumber]
+									#print "test %s" %str(test.value)
+									keyandValueList.append(File(columnNumber, value.value,0,0,test.value)) 
+
+						else : 
+							print "Es un valor sin referencia a label %s"
 
 
-			#print "nameColumn %s" %nameColumn
-			
+
+					print "tamaño de lusta  %s" %len(keyandValueList)			
+					for i in keyandValueList: 
+						print "i %s" %str(i.key)
+
+			#print "keyandValueList %s" %str(keyandValueList)
 			#print "fieldsListParam %s" %str(headerNameFilter)
 			#Filtramos los campos
 
@@ -171,13 +194,13 @@ def metodo():
 
    			
 			subfieldSizeList=[]
-			for sizeSubfields in subfieldsFiltered :
+			#for sizeSubfields in subfieldsFiltered :
 			
-				subfieldSizeList.append(sizeSubfields.sizeList)
+			#	subfieldSizeList.append(sizeSubfields.sizeList)
 		
-				numSubfields= 0
-			if(len(subfieldSizeList)>0):
-				numSubfields=np.amax(subfieldSizeList)
+			#	numSubfields= 0
+			#if(len(subfieldSizeList)>0):
+			#	numSubfields=np.amax(subfieldSizeList)
 			#-------------------------------LLENA CAMPOS---------------------
 			#Recorremos los campos por posicion
 			row = 0
@@ -201,6 +224,28 @@ def metodo():
    			
    			#--------------------------------------------------------------------
    			col += 1
+   			
+   			listadeparametrosSubcampos = filter(lambda field: field[0]==category[0] and str(col)==field[1], subfieldListParam)
+   			for listasubcamposFiltrada in listadeparametrosSubcampos : 
+   				subcamposKeyValueFinal = filter(lambda field: field.key==listasubcamposFiltrada[2], keyandValueList)
+   			
+   				for orderandValueSub in subcamposKeyValueFinal:
+   						hoja.write(row, col, orderandValueSub.value)
+   						row += 1
+
+
+   			print "listadeparametrosSubcampos %s" %listadeparametrosSubcampos
+   			#listadeparametrosSubcampos=[]
+   			#for t in subfieldListParam :
+   				#print "-----------------------------------> %s" %str(t)
+   			#	if(t[0]==category[0] and t[1]==str(col)) :
+   			#		listadeparametrosSubcampos= t
+   			#		print "testing %s" %str(listadeparametrosSubcampos)
+   				
+   			
+   			
+
+   			
    			row = 0
 
    			for idx,subfield in enumerate(subfieldsFiltered) : 
@@ -213,8 +258,8 @@ def metodo():
    					nameSubHeader= 'campo'+str(columnNumber)+'.'+str(col)
    					#hoja.write(row, col, nameSubHeader)	
    					#row += 1
-   				if(subfield.rowNumber != subfieldsFiltered[idx-1].rowNumber) :
-	   				print "rows ss %s" %idx
+   				#if(subfield.rowNumber != subfieldsFiltered[idx-1].rowNumber) :
+	   				#print "rows ss %s" %idx
    					#row += 1
 
 	   			#hoja.write(row, col, subfield.value)

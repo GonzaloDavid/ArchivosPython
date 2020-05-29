@@ -26,7 +26,7 @@ class File:
     def print_value(self):
         print self.value
 
-def metodo():
+def Readprocess():
 	  
 	# --------------------------------------------------------------------------------
 	#Obtener datos de parametrizacion
@@ -57,17 +57,14 @@ def metodo():
 	subfields=getListBuffer[1]
 	fieldSizeList=getListBuffer[2]
 	# --------------------------------------------------------------------------------
-	#Escribir en el archivo
 	
 	countCategory=0
 	for category in categoryListParam :
-		#print "countCategory %s" %countCategory
-		#print "category %s" %category[0]
+		
 		nameFile= 'LecturaArchivos'+category[3]+'.xlsx'
 		libro = xlsxwriter.Workbook(nameFile)
 		codecategoryCurrency=category[0]
 		hoja = libro.add_worksheet(category[3])
-
 		tamanio = len(orderandValueList);
 
 		#Obtenemos el numero de campos o columnas en archivo
@@ -77,20 +74,11 @@ def metodo():
 		col = 0
 		row = 0
 
-		#for fieldParam in fieldsListParam : 
-		#Solo para los subItems
-
-
-	
 		for columnNumber in range(numFields) :
-			#Buscar nombre de cabecera
-			#print "columnNumber %s" %columnNumber
+			
 			keyandValueList=[]
-			headerNameFilterbyCategory= filter(lambda field:  field[0]==category[0]  , fieldsListParam)
-			
-			headerNameFilter= filter(lambda field:  int(field[1])==columnNumber+1  , headerNameFilterbyCategory)
 			nameColumn=''
-			
+			headerNameFilter=filterFieldParambyCategory(fieldsListParam,category,columnNumber)
 			#Obtenemos el numero maximo de subcampos
 			subfieldsFiltered=filter(lambda field: field.order==columnNumber, subfields)
 
@@ -300,4 +288,11 @@ def getFieldsParam(ruta) :
 		countLine= countLine+1	
 	return (orderandValueList,subfields,fieldSizeList)
 
-metodo()
+def filterFieldParambyCategory(fieldsListParam,category ,columnNumber):
+	headerNameFilterbyCategory= filter(lambda field:  field[0]==category[0]  , fieldsListParam)
+	headerNameFilter= filter(lambda field:  int(field[1])==columnNumber+1  , headerNameFilterbyCategory)
+	return  headerNameFilter
+
+
+
+Readprocess()
